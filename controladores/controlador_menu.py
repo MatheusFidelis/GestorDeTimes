@@ -28,7 +28,3 @@ class ControladorMenu (ControladorAbstrato):
     @property
     def controlador_cliente(self):
         return self.__controlador_jogador
-    
-  
-    
-    

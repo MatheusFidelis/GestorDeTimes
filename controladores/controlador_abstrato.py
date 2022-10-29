@@ -1,10 +1,11 @@
 from abc import abstractmethod, ABC
 
+
 class ControladorAbstrato(ABC):
     @abstractmethod
-    def __init__():
+    def __init__(self):
         pass
 
     @abstractmethod
-    def inicia():
+    def inicia(self):
         pass
