@@ -1,7 +1,7 @@
 from controladores.controlador_abstrato import ControladorAbstrato
 from entidades.class_jogador import Jogador
 from telas.tela_elenco import TelaElenco
-
+from entidades.class_contrato import Contrato
 
 class ControladorJogador(ControladorAbstrato):
 
@@ -31,8 +31,11 @@ class ControladorJogador(ControladorAbstrato):
                 if jogador.camisa == int(dados["camisa"]):
                     self.__tela.mensagem_erro("número da camisa existente")
                     continue
+
+            contrato = Contrato(dados["contrato"]["salario"], dados["contrato"]["multa"]) #objeto contrato
+
             jogador = Jogador(dados["nome"], int(dados["idade"]), dados["posicao"], int(
-                dados["camisa"]), float(dados["salario"]))
+                dados["camisa"]), contrato)
             self.__jogadores.append(jogador)
             self.__tela.mensagem("cadastro realizada com sucesso")
             break
