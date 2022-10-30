@@ -1,11 +1,11 @@
 class Jogador:
     
-    def __init__(self, nome: str, camisa: int, posicao: str, idade: int, salario: float):
+    def __init__(self, nome: str, camisa: int, posicao: str, idade: int, contrato):
         self.__nome = nome
         self.__camisa = camisa
         self.__posicao = posicao
         self.__idade = idade
-        self.__salario = salario  
+        self.__contrato = contrato
     
     @property
     def nome(self):
@@ -39,12 +39,3 @@ class Jogador:
     def idade(self, idade: int):
         self.__idade = idade
         
-    
-    @property
-    def salario(self):
-        return self.__salario
-    
-    @salario.setter
-    def salario(self, salario: float):
-        self.__salario = salario
-
