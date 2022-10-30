@@ -73,7 +73,7 @@ class ControladorJogador(ControladorAbstrato):
             while True:
                 dados = self.__tela.dados_alterar()
                 dados["camisa"] = Jogador.camisa
-                if not self.verificar_dados(dados):
+                if not self.verificar_Pdados(dados):
                     continue
                 jogador.nome = dados["nome"]
                 jogador.idade = dados["idade"]
