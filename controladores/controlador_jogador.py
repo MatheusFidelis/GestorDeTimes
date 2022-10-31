@@ -12,7 +12,6 @@ class ControladorJogador(ControladorAbstrato):
         self.__orcamento = int()
         self.__despesa = 0
 
-
     @property
     def despesa(self):
         return self.__despesa
@@ -112,7 +111,6 @@ class ControladorJogador(ControladorAbstrato):
         if not dados["camisa"].isnumeric():
             self.__tela.mensagem_erro("Camisa invalido")
             return False
-
 
         return True
 
