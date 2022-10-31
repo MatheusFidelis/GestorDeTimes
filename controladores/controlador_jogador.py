@@ -17,10 +17,9 @@ class ControladorJogador(ControladorAbstrato):
             if opcao == "0":
                 break
             try:
-                if opcao in opcoes.keys():
-                    opcoes[opcao].inicia()
+                opcoes[opcao]()
             except:
-                self.__tela.mensagem_erro("Comando Inválido")
+                self.__tela.mensagem_erro("Comando Inválido ( sessão elenco )")
 
     def contrato(self):
         while True:
@@ -36,31 +35,37 @@ class ControladorJogador(ControladorAbstrato):
 
             jogador = Jogador(dados["nome"], int(dados["idade"]), dados["posicao"], int(
                 dados["camisa"]), contrato)
+
             self.__jogadores.append(jogador)
             self.__tela.mensagem("cadastro realizada com sucesso")
             break
 
     def verificar_dados(self, dados):
-        if dados["nome"].strip() == "":
+
+
+        if len(dados["nome"]) == 0:
             self.__tela.mensagem_erro("Nome não pode estar vazio")
             return False
         if not dados["idade"].isnumeric():
-            self.__tela.mensagem_erro("Comando invalido")
+            self.__tela.mensagem_erro("Valor inválido para idade")
             return False
-        if not dados["posicao"].strip() == "":
-            self.__tela.mensagem_erro("Nome não pode estar vazio")
+        if len(dados["posicao"]) == 0:
+            self.__tela.mensagem_erro("Posicao não pode estar vazio")
             return False
         if not dados["camisa"].isnumeric():
-            self.__tela.mensagem_erro("Comando invalido")
+            self.__tela.mensagem_erro("Camisa invalido")
             return False
-        if not isinstance(dados["camisa"], float):
-            self.__tela.mensagem_erro("Numero Invalido")
-            return False
+
+
         return True
 
     def dados_jogador(self, jogador):
         dados = {"nome": jogador.nome, "idade": jogador.idade, "posicao": jogador.posicao,
-                 "camisa": jogador.camisa, "salario": jogador.salario}
+                 "camisa": jogador.camisa}
+        print('dados')
+        print(jogador.contrato.salario)
+
+        print(jogador.contrato.multa)
         return dados
 
     def seleciona_jogador(self):
@@ -68,15 +73,17 @@ class ControladorJogador(ControladorAbstrato):
         for jogador in self.__jogadores:
             if jogador.camisa == int(camisa):
                 return jogador
+        return False
+
 
     def alterar(self):
-        jogador = self.seleciona_jogadores()
+        jogador = self.seleciona_jogador()
         if isinstance(jogador, Jogador):
             self.__tela.mostra_jogador(self.dados_jogador(jogador))
             while True:
                 dados = self.__tela.dados_alterar()
                 dados["camisa"] = Jogador.camisa
-                if not self.verificar_Pdados(dados):
+                if not self.verificar_dados(dados):
                     continue
                 jogador.nome = dados["nome"]
                 jogador.idade = dados["idade"]
@@ -87,8 +94,26 @@ class ControladorJogador(ControladorAbstrato):
         else:
             self.__tela.mensagem_erro("Jogador não encontrado")
 
-    '''def remover(self): aqui vai a rescisao'''
+    def remover(self): #aqui vai a rescisao
+        self.__tela.mensagem("=== REMOVER JOGADOR ===")
+        camisa = self.__tela.seleciona()
+        i = 0
+        encontrado = False
+        try:
+            while i < len(self.__jogadores) and not encontrado:
+                if self.__jogadores[i].camisa == camisa:
+                    self.__jogadores.pop(i)
+                    encontrado = True
+                    self.__tela.mensagem("Jogador removido com sucesso")
+                return
+                i += 1
+        except:
+            self.__tela.mensagem_erro("Jogador não encontrado")
+
+
 
     def listar(self):
+        if self.__jogadores == []:
+            self.__tela.mensagem_erro("Não há jogador para mostrar")
         for jogador in self.__jogadores:
             self.__tela.mostra_jogador(self.dados_jogador(jogador))
