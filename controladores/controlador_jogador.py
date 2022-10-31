@@ -9,9 +9,29 @@ class ControladorJogador(ControladorAbstrato):
         self.__jogadores = []
         self.__tela = TelaElenco()
         self.__historico = []
+        self.__despesa = 0
+        #self.__orcamento = time.orcamento()
+
+    @property
+    def despesa(self):
+        return self.__despesa
+
+    @despesa.setter
+    def despesa(self, despesa):
+        self.__despesa = despesa
+
+    @property
+    def jogadores(self):
+        return self.__jogadores
+
+    @jogadores.setter
+    def jogadores(self, jogador):
+        self.__jogadores.append(jogador)
+
     def inicia(self):
         opcoes = {"1": self.contrato, "2": self.alterar,
-                  "3": self.listar, "4": self.remover, "5": self.historico_jogadores}
+                  "3": self.listar, "4": self.remover, "5": self.historico_jogadores,
+                  "6": self.checa_despesa}
         while True:
             opcao = self.__tela.opcoes()
             if opcao == "0":
@@ -39,6 +59,7 @@ class ControladorJogador(ControladorAbstrato):
             jogador = Jogador(dados["nome"], int(dados["camisa"]), dados["posicao"], int(
                 dados["idade"]), contrato)
 
+            self.__despesa += dados['contrato']['salario']
             self.atualiza_historico({'nome': dados['nome'], 'camisa': dados['camisa'], 'acao': 'adiciona'})
             self.__jogadores.append(jogador)
             self.__tela.mensagem("cadastro realizada com sucesso")
@@ -63,7 +84,6 @@ class ControladorJogador(ControladorAbstrato):
             return dados
 
     def verificar_dados(self, dados):
-
 
         if len(dados["nome"]) == 0:
             self.__tela.mensagem_erro("Nome não pode estar vazio")
@@ -163,17 +183,23 @@ class ControladorJogador(ControladorAbstrato):
         try:
             while (i < len(self.__jogadores)) and (not encontrado):
                 if self.__jogadores[i].camisa == camisa and self.__tela.confirma_exclusao() == '0':
-                    dados_historico = {'nome': self.__jogadores[i].nome, 'camisa': self.__jogadores[i].camisa, 'acao': 'removido'}
-                    self.atualiza_historico(self, dados_historico)
-
-
-                    self.__jogadores.pop(i)
+                    jogador = self.__jogadores.pop(i)
                     self.__tela.mensagem("Jogador removido com sucesso")
 
                     encontrado = True
-
-                    return
                 i += 1
+
+            dados_historico = {
+                'nome': jogador.nome,
+                'camisa': jogador.camisa,
+                'acao': 'removido'
+            }
+
+            self.atualiza_historico(dados_historico)
+            dados = self.dados_jogador(jogador)
+            print(dados)
+            self.__despesa -= (dados['salario'])
+
         except:
             self.__tela.mensagem_erro("Jogador não existe")
 
@@ -197,5 +223,12 @@ class ControladorJogador(ControladorAbstrato):
 
         i = 1
         for dado in self.__historico:
-            self.__tela.mensagem_historico(f"\nNome: {dado['nome']} \nCamisa: {dado['camisa']}\ Acao: {dado['acao']} \n {'_' * 20}", i)
+            self.__tela.mensagem_historico(f"\nNome: {dado['nome']} \nCamisa: {dado['camisa']}\nAcao: {dado['acao']} \n {'_' * 20}", i)
             i += 1
+
+    def checa_despesa(self):
+        self.__tela.mensagem("Despesas")
+        self.__tela.mensagem(f"Total despesa: R${self.__despesa}")
+
+    def checa_orcamento(self):
+        self.__tela.mensagem("Orcamento")

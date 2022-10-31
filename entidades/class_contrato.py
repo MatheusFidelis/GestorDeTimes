@@ -1,4 +1,4 @@
-class Contrato():
+class Contrato:
     def __init__(self, salario: float, multa: float):
         self._salario = salario
         self._multa = multa

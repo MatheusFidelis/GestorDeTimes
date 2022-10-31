@@ -1,7 +1,5 @@
-
-
-class Time():
-    def __init__(self, nome, orcamento):
+class Time:
+    def __init__(self, nome: str, orcamento: float):
         self.__nome = nome
         self.__orcamento = orcamento
 

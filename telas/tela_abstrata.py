@@ -1,8 +1,8 @@
 from abc import abstractmethod, ABC
 
 class TelaAbstrata(ABC):
-    @abstractmethod
-    def __init__():
+    #@abstractmethod
+    def __init__(self):
         pass
 
     def mensagem(self, msg):

@@ -38,4 +38,11 @@ class Jogador:
     @idade.setter
     def idade(self, idade: int):
         self.__idade = idade
-        
+
+    @property
+    def contrato(self):
+        return self.__contrato
+
+    @contrato.setter
+    def contrato(self, contrato):
+        self.__contrato = contrato

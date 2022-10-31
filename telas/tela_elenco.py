@@ -1,9 +1,9 @@
 from telas.tela_abstrata import TelaAbstrata
 
 class TelaElenco(TelaAbstrata):
-    
     def __init__(self):
         pass
+
     
     def opcoes(self):
         print(" --- Gerenciar Elenco--- ")
@@ -11,22 +11,22 @@ class TelaElenco(TelaAbstrata):
         print("2 - Editar Informações do Jogador")
         print("3 - Listar Jogadores")
         print("4 - Rescindir Jogador")
+        print("5 - Histórico de Jogadores")
+        print("6 - Checar despesas")
         print("0 - Voltar")
     
         opcao = input("Escolha uma das opções: ")
         return opcao
     
     def dados_jogador(self):
-        print("------- CADASTRAR JOGADOR -------")
+        print("------- INFORMAÇÔES DO JOGADOR -------")
         nome = input("Nome: ")
         idade = input("Idade: ")
         posicao = input("Posição: ")
         camisa = input("Camisa: ")
-        salario =  input("Salario: ")
+        contrato = {'salario': float(input("Salario: ")), 'multa': float(input("Multa: "))}
 
-
-        
-        return {"nome": nome, "idade": idade, "posicao": posicao, "camisa": camisa, "salario": salario}
+        return {"nome": nome, "idade": idade, "posicao": posicao, "camisa": camisa, "contrato": contrato}
     
     def dados_alterar(self):
         print("------- ALTERAR JOGADOR -------")
@@ -34,9 +34,9 @@ class TelaElenco(TelaAbstrata):
         idade = input("Idade: ")
         posicao = input("Posição: ")
         camisa = input("Camisa: ")
+        contrato = {'salario': float(input("Salario: ")), 'multa': float(input("Multa: "))}
 
-        
-        return {"nome": nome, "idade": idade, "posicao": posicao, "camisa": camisa}
+        return {"nome": nome, "idade": idade, "posicao": posicao, "camisa": camisa, "contrato": contrato}
     
     
     def seleciona(self):
@@ -61,5 +61,14 @@ class TelaElenco(TelaAbstrata):
         print("POSIÇÃO: ", dados_jogador["posicao"])
         print("Camisa: ", dados_jogador["camisa"])
         print("Salario: ", dados_jogador["salario"])
+        print("Multa: ", dados_jogador["multa"])
+
         print("\n")
-        
+
+    def mensagem_historico(self, msg, n):
+        print(f'{n}: {msg}')
+    def mensagem(self, msg):
+        print("----- " + msg + " -----")
+
+    def mensagem_erro(self, msg):
+        print("##### " + msg + " #####")

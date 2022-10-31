@@ -6,7 +6,7 @@ class TelaMenu(TelaAbstrata):
         pass
     
     def opcoes(self):
-        print(" --- Gerenciador de Elenco --- ")
+        print(" --- Menu principal --- ")
         print("Escolha uma das opções")
         print("1 - Gerenciar Elenco")
         print("2 - Gerenciar Orçamento")
