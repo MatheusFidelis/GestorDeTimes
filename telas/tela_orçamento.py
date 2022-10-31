@@ -16,3 +16,14 @@ class TelaMenu(TelaAbstrata):
 
         opcao = input("Escolha uma das opções: ")
         return opcao
+
+    def checar_orcamento(self, orcamento, despesas):
+        print("Orcamento:")
+        print(f"Orcamento total: {orcamento}")
+        print(f"Despesas: {despesas}")
+
+    def mensagem(self, msg):
+        print("----- " + msg + " -----")
+
+    def mensagem_erro(self, msg):
+        print("#####" + msg + "#####")
