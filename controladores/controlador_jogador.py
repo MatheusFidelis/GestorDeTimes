@@ -8,10 +8,10 @@ class ControladorJogador(ControladorAbstrato):
     def __init__(self):
         self.__jogadores = []
         self.__tela = TelaElenco()
-
+        self.__historico = []
     def inicia(self):
         opcoes = {"1": self.contrato, "2": self.alterar,
-                  "3": self.listar, "4": self.remover}
+                  "3": self.listar, "4": self.remover, "5": self.historico_jogadores}
         while True:
             opcao = self.__tela.opcoes()
             if opcao == "0":
@@ -21,6 +21,9 @@ class ControladorJogador(ControladorAbstrato):
             except:
                 self.__tela.mensagem_erro("Comando Inválido ( sessão elenco )")
 
+    def atualiza_historico(self, dados):
+        self.__historico.append({'nome': dados['nome'], 'camisa': dados['camisa'], 'acao': dados['acao']})
+
     def contrato(self):
         while True:
             dados = self.__tela.dados_jogador()
@@ -29,13 +32,14 @@ class ControladorJogador(ControladorAbstrato):
             for jogador in self.__jogadores:
                 if jogador.camisa == int(dados["camisa"]):
                     self.__tela.mensagem_erro("número da camisa existente")
-                    continue
+                    break
 
             contrato = Contrato(dados["contrato"]["salario"], dados["contrato"]["multa"]) #objeto contrato
 
             jogador = Jogador(dados["nome"], int(dados["camisa"]), dados["posicao"], int(
                 dados["idade"]), contrato)
 
+            self.atualiza_historico({'nome': dados['nome'], 'camisa': dados['camisa'], 'acao': 'adiciona'})
             self.__jogadores.append(jogador)
             self.__tela.mensagem("cadastro realizada com sucesso")
             break
@@ -95,6 +99,9 @@ class ControladorJogador(ControladorAbstrato):
         return camisa
 
     def alterar(self):
+        if self.__jogadores == []:
+            self.__tela.mensagem_erro("Não há jogadores cadastrados")
+            return
         camisa = self.seleciona_jogador()
 
         i = 0
@@ -110,13 +117,22 @@ class ControladorJogador(ControladorAbstrato):
             self.__tela.mensagem_erro("Jogador não encontrado")
             return
 
+        i = 0
+
+        while i < len(self.__jogadores): #verifica se camisa já existe
+            if self.__jogadores[i] == camisa and (i != posicao):
+                self.__tela.mensagem_erro("Camisa já existe")
+                return
+
+            i += 1
         dados = self.novos_dados()
-        print(dados)
         contrato = Contrato(dados["contrato"]["salario"], dados["contrato"]["multa"])  # objeto contrato
 
         try:
             jogador = Jogador(dados["nome"], (dados["camisa"]), dados["posicao"], int(dados["idade"]), contrato)
 
+            dados_historico = {'nome': dados['nome'], 'camisa': dados['camisa'], 'acao': 'alteracao'}
+            self.atualiza_historico(dados_historico)
             self.__jogadores.pop(posicao)
             self.__jogadores.append(jogador)
             self.__tela.mensagem("Alteração realizada com sucesso")
@@ -146,11 +162,17 @@ class ControladorJogador(ControladorAbstrato):
         encontrado = False
         try:
             while (i < len(self.__jogadores)) and (not encontrado):
-                if self.__jogadores[i].camisa == camisa and self.__tela.confirma_exclusao():
+                if self.__jogadores[i].camisa == camisa and self.__tela.confirma_exclusao() == '0':
+                    dados_historico = {'nome': self.__jogadores[i].nome, 'camisa': self.__jogadores[i].camisa, 'acao': 'removido'}
+                    self.atualiza_historico(self, dados_historico)
+
+
                     self.__jogadores.pop(i)
-                    encontrado = True
                     self.__tela.mensagem("Jogador removido com sucesso")
-                return
+
+                    encontrado = True
+
+                    return
                 i += 1
         except:
             self.__tela.mensagem_erro("Jogador não existe")
@@ -159,9 +181,21 @@ class ControladorJogador(ControladorAbstrato):
             self.__tela.mensagem("Jogador removido com sucesso")
 
 
-
     def listar(self):
         if self.__jogadores == []:
             self.__tela.mensagem_erro("Não há jogador para mostrar")
+            return
         for jogador in self.__jogadores:
             self.__tela.mostra_jogador(self.dados_jogador(jogador))
+
+    def historico_jogadores(self):
+        self.__tela.mensagem("Histórico de jogadores")
+
+        if self.__historico == []:
+            self.__tela.mensagem_erro("Nenhuma movimentação.")
+            return
+
+        i = 1
+        for dado in self.__historico:
+            self.__tela.mensagem_historico(f"\nNome: {dado['nome']} \nCamisa: {dado['camisa']}\ Acao: {dado['acao']} \n {'_' * 20}", i)
+            i += 1
