@@ -12,7 +12,9 @@ class TelaElenco(TelaAbstrata):
         print("3 - Listar Jogadores")
         print("4 - Rescindir Jogador")
         print("5 - Histórico de Jogadores")
-        print("6 - Checar despesas")
+        print("6 - Checar Despesas")
+        print("7 - Checar Orcamento Geral")
+        print("8 - Orcamento Disponivel")
         print("0 - Voltar")
     
         opcao = input("Escolha uma das opções: ")

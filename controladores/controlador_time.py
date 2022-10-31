@@ -10,6 +10,8 @@ class ControladorTime():
 
 #    def cadastrar_time(self):
 
+    def time_orcamento(self):
+        return self.__time.orcamento
 
     # TODO: adicionar orcamento
     # def adicionar_orcamento(self):

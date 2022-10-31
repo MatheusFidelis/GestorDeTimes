@@ -9,8 +9,9 @@ class ControladorJogador(ControladorAbstrato):
         self.__jogadores = []
         self.__tela = TelaElenco()
         self.__historico = []
+        self.__orcamento = int()
         self.__despesa = 0
-        #self.__orcamento = time.orcamento()
+
 
     @property
     def despesa(self):
@@ -28,10 +29,25 @@ class ControladorJogador(ControladorAbstrato):
     def jogadores(self, jogador):
         self.__jogadores.append(jogador)
 
+    @property
+    def orcamento(self):
+        return self.__orcamento
+
+    @orcamento.setter
+    def orcamento(self, orcamento):
+        self.__orcamento = orcamento
+
     def inicia(self):
-        opcoes = {"1": self.contrato, "2": self.alterar,
-                  "3": self.listar, "4": self.remover, "5": self.historico_jogadores,
-                  "6": self.checa_despesa}
+        opcoes = {
+                    "1": self.contrato,
+                    "2": self.alterar,
+                    "3": self.listar,
+                    "4": self.remover,
+                    "5": self.historico_jogadores,
+                    "6": self.checa_despesa,
+                    "7": self.checa_orcamento,
+                    "8": self.orcamento_disponivel
+                  }
         while True:
             opcao = self.__tela.opcoes()
             if opcao == "0":
@@ -47,9 +63,14 @@ class ControladorJogador(ControladorAbstrato):
     def contrato(self):
         while True:
             dados = self.__tela.dados_jogador()
-            if not self.verificar_dados(dados):
+            if (dados['contrato']['salario'] + self.__despesa) > self.__orcamento: #verifica se valor não ultrapassa orcamento
+                print('Não pode contratar')
+                break
+
+            if not self.verificar_dados(dados): #verifica integridade dos dados
                 continue
-            for jogador in self.__jogadores:
+
+            for jogador in self.__jogadores: # verifica se há outro jogador com mesma camisa
                 if jogador.camisa == int(dados["camisa"]):
                     self.__tela.mensagem_erro("número da camisa existente")
                     break
@@ -67,19 +88,13 @@ class ControladorJogador(ControladorAbstrato):
 
     def novos_dados(self):
         while True:
-            dados = self.__tela.dados_jogador()
+            dados = self.__tela.dados_alterar()
             if not self.verificar_dados(dados):
                 continue
             for jogador in self.__jogadores:
                 if jogador.camisa == int(dados["camisa"]):
                     self.__tela.mensagem_erro("número da camisa existente")
                     continue
-
-            #contrato = Contrato(dados["contrato"]["salario"], dados["contrato"]["multa"]) #objeto contrato
-
-            #jogador = Jogador(dados["nome"], int(dados["idade"]), dados["posicao"], int(
-            #    dados["camisa"]), contrato)
-
 
             return dados
 
@@ -119,16 +134,21 @@ class ControladorJogador(ControladorAbstrato):
         return camisa
 
     def alterar(self):
-        if self.__jogadores == []:
+        if self.__jogadores == []: # verifica se não há jogadores
             self.__tela.mensagem_erro("Não há jogadores cadastrados")
             return
         camisa = self.seleciona_jogador()
 
+
         i = 0
         encontrado = False
-        while i < len(self.__jogadores) and (not encontrado):
+        while i < len(self.__jogadores) and (not encontrado):  #busca jogador
             print(self.__jogadores[i].camisa)
             if self.__jogadores[i].camisa == camisa:
+                salario_anterior = self.__jogadores[i].contrato.salario
+
+                print('salario anteior:', salario_anterior)
+
                 encontrado = True
                 posicao = i
             i += 1
@@ -139,7 +159,7 @@ class ControladorJogador(ControladorAbstrato):
 
         i = 0
 
-        while i < len(self.__jogadores): #verifica se camisa já existe
+        while i < len(self.__jogadores): #verifica se nova camisa já existe
             if self.__jogadores[i] == camisa and (i != posicao):
                 self.__tela.mensagem_erro("Camisa já existe")
                 return
@@ -148,6 +168,9 @@ class ControladorJogador(ControladorAbstrato):
         dados = self.novos_dados()
         contrato = Contrato(dados["contrato"]["salario"], dados["contrato"]["multa"])  # objeto contrato
 
+        if self.__orcamento < self.__despesa + dados['contrato']['salario'] - salario_anterior: # verifica se valor condiz com orcamento
+            self.__tela.mensagem_erro("Salario impagável.")
+            return
         try:
             jogador = Jogador(dados["nome"], (dados["camisa"]), dados["posicao"], int(dados["idade"]), contrato)
 
@@ -157,17 +180,12 @@ class ControladorJogador(ControladorAbstrato):
             self.__jogadores.append(jogador)
             self.__tela.mensagem("Alteração realizada com sucesso")
 
-            #self.__jogadores[posicao].nome = dados["nome"]
-            #self.__jogadores[posicao].idade = dados["idade"]
-            #self.__jogadores[posicao].posicao = dados["posicao"]
-            #elf.__jogadores[posicao].camisa = dados["camisa"]
-            #elf.__jogadores[posicao].contrato.salario = dados['contrato']['salario']
-            #self.__jogadores[posicao].contrato.multa = dados['contrato']['multa']
+            self.despesa += (dados['contrato']['salario'] - salario_anterior) # atualiza valor do jogador cadastrado no atributo despesa
+
         except:
-            print("Erro ao tentar alterar")
+            self.__tela.mensagem_erro("Erro ao tentar alterar")
 
 
-        print(self.__jogadores)
 
 
     def remover(self): #aqui vai a rescisao
@@ -180,6 +198,7 @@ class ControladorJogador(ControladorAbstrato):
         camisa = int(self.__tela.seleciona())
         i = 0
         encontrado = False
+
         try:
             while (i < len(self.__jogadores)) and (not encontrado):
                 if self.__jogadores[i].camisa == camisa and self.__tela.confirma_exclusao() == '0':
@@ -196,9 +215,11 @@ class ControladorJogador(ControladorAbstrato):
             }
 
             self.atualiza_historico(dados_historico)
+
             dados = self.dados_jogador(jogador)
-            print(dados)
-            self.__despesa -= (dados['salario'])
+            self.__despesa -= dados['salario']
+            self.__orcamento -= dados['multa']
+            self.__tela.mensagem(f"Jogaodr remvido com sucesso. Foi aplciada uma multa de R${dados['multa']}")
 
         except:
             self.__tela.mensagem_erro("Jogador não existe")
@@ -230,5 +251,13 @@ class ControladorJogador(ControladorAbstrato):
         self.__tela.mensagem("Despesas")
         self.__tela.mensagem(f"Total despesa: R${self.__despesa}")
 
-    def checa_orcamento(self):
+    def checa_orcamento(self): #balanço geral
         self.__tela.mensagem("Orcamento")
+        self.__tela.mensagem(f"Orçamento total: R${self.__orcamento}")
+        self.__tela.mensagem(f"Despesa total: R${self.__despesa}")
+        self.__tela.mensagem(f"Disponível: R${(self.__orcamento - self.__despesa)}")
+
+    def orcamento_disponivel(self):
+        self.__tela.mensagem("Orcamento disponivel: ")
+        self.__tela.mensagem(f"Disponível: R${(self.__orcamento - self.__despesa)}")
+
