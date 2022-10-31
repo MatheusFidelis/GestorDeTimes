@@ -61,11 +61,8 @@ class ControladorJogador(ControladorAbstrato):
 
     def dados_jogador(self, jogador):
         dados = {"nome": jogador.nome, "idade": jogador.idade, "posicao": jogador.posicao,
-                 "camisa": jogador.camisa}
-        print('dados')
-        print(jogador.contrato.salario)
+                 "camisa": jogador.camisa, "salario": jogador.contrato.salario, "multa": jogador.contrato.multa}
 
-        print(jogador.contrato.multa)
         return dados
 
     def seleciona_jogador(self):
@@ -89,6 +86,7 @@ class ControladorJogador(ControladorAbstrato):
                 jogador.idade = dados["idade"]
                 jogador.posicao = dados["posicao"]
                 jogador.camisa = dados["camisa"]
+
                 self.__tela.mensagem("Alteração realizada com sucesso")
                 break
         else:
@@ -96,11 +94,16 @@ class ControladorJogador(ControladorAbstrato):
 
     def remover(self): #aqui vai a rescisao
         self.__tela.mensagem("=== REMOVER JOGADOR ===")
-        camisa = self.__tela.seleciona()
+
+        if self.__jogadores == []:
+            self.__tela.mensagem_erro("Não há jogadores cadastrados.")
+            return
+
+        camisa = int(self.__tela.seleciona())
         i = 0
         encontrado = False
         try:
-            while i < len(self.__jogadores) and not encontrado:
+            while (i < len(self.__jogadores)) and (not encontrado):
                 if self.__jogadores[i].camisa == camisa:
                     self.__jogadores.pop(i)
                     encontrado = True
@@ -109,6 +112,9 @@ class ControladorJogador(ControladorAbstrato):
                 i += 1
         except:
             self.__tela.mensagem_erro("Jogador não encontrado")
+
+        else:
+            self.__tela.mensagem("Jogador removido com sucesso")
 
 
 
